@@ -12,6 +12,8 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
         public ushort Id { get; set; }
         [XmlAttribute("BypassPermission")]
         public string Bypass { get; set; }
+        [XmlAttribute("Replace")]
+        public int Replace { get; set; }
 
         public RestrictedItem() { }
     }

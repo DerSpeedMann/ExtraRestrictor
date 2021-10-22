@@ -28,11 +28,14 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
             Logger.Log("ExtraRestrictor Loaded!");
             Logger.Log("Users with the permission extrarestrictor.bypass will bypass restrictions.");
             Logger.Log($"Ignore admins: {Configuration.Instance.IgnoreAdmins}");
+            Logger.Log($"Keep item amount and durability when replacing: {Configuration.Instance.KeepAmountAndDuribility}");
+            Logger.Log($"Notify on item replace: {Configuration.Instance.NotifyReplace}");
+            Logger.Log($"Notify on item remove: {Configuration.Instance.NotifyRemove}");
             Logger.Log("==============");
             Logger.Log("Restricted items:");
 
             foreach (var item in Configuration.Instance.Restricted
-                .Select(x => $"ID: {x.Id} | Name: {Assets.find(EAssetType.ITEM, x.Id)?.name ?? "> INVALID ID <"} | Bypass: {(x.Bypass ?? "None")}"))
+                .Select(x => $"ID: {x.Id} | Name: {Assets.find(EAssetType.ITEM, x.Id)?.name ?? "> INVALID ID <"} | Replace: {(x.Replace == 0 ? "None" : x.Replace.ToString())} | Bypass: {(x.Bypass ?? "None")}"))
                 Logger.Log(item);
 
             Logger.Log("==============");
@@ -54,7 +57,27 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
             if (item != null && !player.GetPermissions().Any(x => x.Name == item.Bypass))
             {
                 player.Inventory.removeItem((byte)inventoryGroup, inventoryIndex);
-                UnturnedChat.Say(player, Util.Translate("item_restricted", Assets.find(EAssetType.ITEM, P.item.id).name, P.item.id), Color.red);
+                if (item.Replace != 0)
+                {
+                    Item replacement = new Item((ushort)item.Replace, true);
+                    if (Configuration.Instance.KeepAmountAndDuribility)
+                    {
+                        replacement.amount = P.item.amount;
+                        replacement.durability = P.item.durability;
+                    }
+                    
+                    player.Inventory.tryAddItem(replacement, P.x, P.y, (byte)inventoryGroup, P.rot);
+                    if (Configuration.Instance.NotifyReplace)
+                    {
+                        UnturnedChat.Say(player, Util.Translate("item_replaced",
+                        Assets.find(EAssetType.ITEM, P.item.id).name, P.item.id,
+                        Assets.find(EAssetType.ITEM, (ushort)item.Replace).name, item.Replace), Color.yellow);
+                    }   
+                }
+                else if (Configuration.Instance.NotifyRemove)
+                {
+                    UnturnedChat.Say(player, Util.Translate("item_restricted", Assets.find(EAssetType.ITEM, P.item.id).name, P.item.id), Color.red);
+                }
             }
         }
 
@@ -113,7 +136,8 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
         public override TranslationList DefaultTranslations =>
             new TranslationList
             {
-                { "item_restricted", "You do not have access to this restricted item. ({0}, {1})" }
+                { "item_restricted", "You do not have access to this restricted item. ({0}, {1})" },
+                { "item_replaced", "The Item {0} ({1}) was replaced with {2} ({3})." }
             };
     }
 }
