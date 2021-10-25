@@ -28,7 +28,6 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
             Logger.Log("ExtraRestrictor Loaded!");
             Logger.Log("Users with the permission extrarestrictor.bypass will bypass restrictions.");
             Logger.Log($"Ignore admins: {Configuration.Instance.IgnoreAdmins}");
-            Logger.Log($"Keep item amount and durability when replacing: {Configuration.Instance.KeepAmountAndDuribility}");
             Logger.Log($"Notify on item replace: {Configuration.Instance.NotifyReplace}");
             Logger.Log($"Notify on item remove: {Configuration.Instance.NotifyRemove}");
             Logger.Log("==============");
@@ -60,13 +59,16 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
                 if (item.Replace != 0)
                 {
                     Item replacement = new Item((ushort)item.Replace, true);
-                    if (Configuration.Instance.KeepAmountAndDuribility)
+                    replacement.amount = item.KeepAmount ? P.item.amount : item.Empty ? (byte)0 : replacement.amount;
+                    replacement.durability = item.KeepDurability ? P.item.durability : replacement.durability;
+
+                    if(!player.Inventory.tryAddItem(replacement, P.x, P.y, (byte)inventoryGroup, P.rot))
                     {
-                        replacement.amount = P.item.amount;
-                        replacement.durability = P.item.durability;
+                        if (!player.GiveItem(replacement))
+                        {
+                            player.Inventory.forceAddItem(replacement, false);
+                        }
                     }
-                    
-                    player.Inventory.tryAddItem(replacement, P.x, P.y, (byte)inventoryGroup, P.rot);
                     if (Configuration.Instance.NotifyReplace)
                     {
                         UnturnedChat.Say(player, Util.Translate("item_replaced",

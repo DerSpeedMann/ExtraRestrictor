@@ -14,7 +14,13 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
         public string Bypass { get; set; }
         [XmlAttribute("Replace")]
         public int Replace { get; set; }
-
+        [XmlAttribute("KeepAmount")]
+        public bool KeepAmount { get; set; }
+        [XmlAttribute("KeepDurability")]
+        public bool KeepDurability { get; set; }
+        [XmlAttribute("Empty")]
+        public bool Empty { get; set; }
+        
         public RestrictedItem() { }
     }
 }
