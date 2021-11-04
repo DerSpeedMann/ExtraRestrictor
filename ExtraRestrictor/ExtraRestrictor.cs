@@ -24,26 +24,36 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
 
             UnturnedPlayerEvents.OnPlayerInventoryAdded += OnInventoryUpdated;
             UnturnedPlayerEvents.OnPlayerWear += OnWear;
+            PlayerCrafting.onCraftBlueprintRequested += OnCraft;
 
             Logger.Log("ExtraRestrictor Loaded!");
             Logger.Log("Users with the permission extrarestrictor.bypass will bypass restrictions.");
             Logger.Log($"Ignore admins: {Configuration.Instance.IgnoreAdmins}");
             Logger.Log($"Notify on item replace: {Configuration.Instance.NotifyReplace}");
             Logger.Log($"Notify on item remove: {Configuration.Instance.NotifyRemove}");
-            Logger.Log("==============");
-            Logger.Log("Restricted items:");
+            Logger.Log($"Notify on craft declined: {Configuration.Instance.NotifyDeclineCraft}");
 
-            foreach (var item in Configuration.Instance.Restricted
+            Logger.Log("Restricted items:");
+            Logger.Log("===================================================================");
+
+            foreach (var item in Configuration.Instance.RestrictedItems
                 .Select(x => $"ID: {x.Id} | Name: {Assets.find(EAssetType.ITEM, x.Id)?.name ?? "> INVALID ID <"} | Replace: {(x.Replace == 0 ? "None" : x.Replace.ToString())} | Bypass: {(x.Bypass ?? "None")}"))
                 Logger.Log(item);
 
-            Logger.Log("==============");
+            Logger.Log("Restricted blueprints:");
+            Logger.Log("===================================================================");
+
+            foreach (var item in Configuration.Instance.RestrictedBlueprints
+                .Select(x => $"ItemID: {x.ItemId} | Name: {Assets.find(EAssetType.ITEM, x.ItemId)?.name ?? "> INVALID ID <"} | Blueprint Index: {(x.BlueprintIndex)} | Bypass: {(x.Bypass ?? "None")}"))
+                Logger.Log(item);
+            Logger.Log("===================================================================");
         }
 
         protected override void Unload()
         {
             UnturnedPlayerEvents.OnPlayerInventoryAdded -= OnInventoryUpdated;
             UnturnedPlayerEvents.OnPlayerWear -= OnWear;
+            PlayerCrafting.onCraftBlueprintRequested -= OnCraft;
         }
 
         private void OnInventoryUpdated(UnturnedPlayer player, InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
@@ -51,14 +61,14 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
             if ((player.IsAdmin && Configuration.Instance.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
                 return;
 
-            RestrictedItem item = Configuration.Instance.Restricted.FirstOrDefault(x => x.Id == P.item.id);
+            RestrictedItem item = Configuration.Instance.RestrictedItems.FirstOrDefault(x => x.Id == P.item.id);
 
             if (item != null && !player.GetPermissions().Any(x => x.Name == item.Bypass))
             {
                 player.Inventory.removeItem((byte)inventoryGroup, inventoryIndex);
                 if (item.Replace != 0)
                 {
-                    Item replacement = new Item((ushort)item.Replace, true);
+                    Item replacement = new Item(item.Replace, true);
                     replacement.amount = item.KeepAmount ? P.item.amount : item.Empty ? (byte)0 : replacement.amount;
                     replacement.durability = item.KeepDurability ? P.item.durability : replacement.durability;
 
@@ -73,7 +83,7 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
                     {
                         UnturnedChat.Say(player, Util.Translate("item_replaced",
                         Assets.find(EAssetType.ITEM, P.item.id).name, P.item.id,
-                        Assets.find(EAssetType.ITEM, (ushort)item.Replace).name, item.Replace), Color.yellow);
+                        Assets.find(EAssetType.ITEM, item.Replace).name, item.Replace), Color.yellow);
                     }   
                 }
                 else if (Configuration.Instance.NotifyRemove)
@@ -85,10 +95,11 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
 
         private void OnWear(UnturnedPlayer player, UnturnedPlayerEvents.Wearables wear, ushort id, byte? quality)
         {
+            
             if ((player.IsAdmin && Configuration.Instance.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
                 return;
 
-            RestrictedItem item = Configuration.Instance.Restricted.FirstOrDefault(x => x.Id == id);
+            RestrictedItem item = Configuration.Instance.RestrictedItems.FirstOrDefault(x => x.Id == id);
 
             if (item != null && !player.GetPermissions().Any(x => x.Name == item.Bypass))
             {
@@ -135,11 +146,34 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
             action();
         }
 
+        private void OnCraft(PlayerCrafting crafting, ref ushort itemID, ref byte blueprintIndex, ref bool shouldAllow)
+        {
+            UnturnedPlayer player = UnturnedPlayer.FromPlayer(crafting.player);
+
+            if ((player.IsAdmin && Configuration.Instance.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
+                return;
+
+            ushort innerItemId = itemID;
+            byte innerBlueprintIdx = blueprintIndex;
+            RestrictedBlueprint blueprint = Configuration.Instance.RestrictedBlueprints.FirstOrDefault(x => x.ItemId == innerItemId && x.BlueprintIndex == innerBlueprintIdx);
+
+            if (blueprint != null && !player.GetPermissions().Any(x => x.Name == blueprint.Bypass))
+            {
+                shouldAllow = false;
+
+                if (Configuration.Instance.NotifyDeclineCraft)
+                {
+                    UnturnedChat.Say(player, Util.Translate("blueprint_restricted", Assets.find(EAssetType.ITEM, innerItemId).name, innerItemId), Color.red);
+                }
+            }
+        }
+
         public override TranslationList DefaultTranslations =>
             new TranslationList
             {
                 { "item_restricted", "You do not have access to this restricted item. ({0}, {1})" },
-                { "item_replaced", "The Item {0} ({1}) was replaced with {2} ({3})." }
+                { "item_replaced", "The Item {0} ({1}) was replaced with {2} ({3})." },
+                { "blueprint_restricted", "You do not have access to this Crafting Recipe ({0}, {1})." }
             };
     }
 }

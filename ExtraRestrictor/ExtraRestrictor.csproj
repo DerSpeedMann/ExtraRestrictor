@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RestrictedBlueprint.cs" />
     <Compile Include="ExtraRestrictor.cs" />
     <Compile Include="ExtraRestrictorConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
