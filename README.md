@@ -7,7 +7,7 @@ Documentation available here: https://iceplugins.xyz/ExtraRestrictor
 
 RestrictedItems allows to list item ids to be restricted (removed or replaced) 
 
-- Replace alows to set and item id to replace the item with
+- Replace alows to set an item id to replace the original item with (0 = only remove original item)
 - KeepAmount allows to repace while keeping the original items amount (magazine capacity and so on)
 - Empty allows to repace with an empty item (amount = 0)
 - KeepDurability allows to repace while keeping the original items durability
