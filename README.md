@@ -7,10 +7,10 @@ Documentation available here: https://iceplugins.xyz/ExtraRestrictor
 
 RestrictedItems allows to list item ids to be restricted (removed or replaced) 
 
-- Replace alows to set an item id to replace the original item with (0 = only remove original item)
-- KeepAmount allows to repace while keeping the original items amount (magazine capacity and so on)
-- Empty allows to repace with an empty item (amount = 0)
-- KeepDurability allows to repace while keeping the original items durability
+- Replace: alows to set an item id to replace the original item with (0 = only remove original item)
+- KeepAmount: allows to repace while keeping the original items amount (magazine capacity and so on)
+- Empty allows: to repace with an empty item (amount = 0)
+- KeepDurability: allows to repace while keeping the original items durability
 ```xml
 <Item Replace="40200" KeepAmount="true" KeepDurability="false" Empty="false">44</Item>
 ```
@@ -18,7 +18,7 @@ RestrictedItems allows to list item ids to be restricted (removed or replaced)
 ## Restrict Blueprints:
 
 RestrictedBlueprint allows to restrict blueprints for items by id and index (disable crafting)
-- BlueprintIndex the index of the blueprint (Blueprint_0_... would be index 0)
+- BlueprintIndex: the index of the blueprint (Blueprint_0_... would be index 0)
 ```xml
 <RestrictedBlueprint BlueprintIndex="1">1169</RestrictedBlueprint>
 ```
@@ -78,8 +78,7 @@ RestrictedBlueprint allows to restrict blueprints for items by id and index (dis
     <Item Replace="40125" KeepAmount="false" KeepDurability="false" Empty="true">40153</Item>
     <Item Replace="40124" KeepAmount="false" KeepDurability="false" Empty="true">40154</Item>
   </RestrictedItems>
-  <RestrictedBlueprints>
-  </RestrictedBlueprints>
+  <RestrictedBlueprints />
   <IgnoreAdmins>false</IgnoreAdmins>
   <NotifyReplace>false</NotifyReplace>
   <NotifyRemove>true</NotifyRemove>
