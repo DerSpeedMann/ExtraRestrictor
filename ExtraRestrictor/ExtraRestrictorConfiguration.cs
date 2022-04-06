@@ -12,6 +12,10 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
         [XmlArrayItem(ElementName = "Item")]
         public List<RestrictedItem> RestrictedItems;
         public List<RestrictedBlueprint> RestrictedBlueprints;
+        [XmlArrayItem(ElementName = "RestrictedSupply")]
+        public List<ushort> RestrictByCraftingSupply;
+        [XmlArrayItem(ElementName = "RestrictedOutput")]
+        public List<ushort> RestrictByCraftingOutput;
 
         public bool IgnoreAdmins;
         public bool NotifyReplace;
@@ -29,6 +33,14 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
             RestrictedBlueprints = new List<RestrictedBlueprint>
             {
                 new RestrictedBlueprint {ItemId = 121, BlueprintIndex = 0}
+            };
+            RestrictByCraftingSupply = new List<ushort>
+            {
+                67
+            };
+            RestrictByCraftingOutput = new List<ushort>
+            {
+                66
             };
             IgnoreAdmins = false;
             NotifyReplace = false;

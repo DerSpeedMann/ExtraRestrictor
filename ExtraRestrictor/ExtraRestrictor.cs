@@ -16,11 +16,12 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
 {
     public class ExtraRestrictor : RocketPlugin<ExtraRestrictorConfiguration>
     {
-        public static ExtraRestrictor Instance { get; private set; }
-
+        public static ExtraRestrictor Inst { get; private set; }
+        public static ExtraRestrictorConfiguration Conf { get; private set; }
         protected override void Load()
         {
-            Instance = this;
+            Inst = this;
+            Conf = Configuration.Instance;
 
             UnturnedPlayerEvents.OnPlayerInventoryAdded += OnInventoryUpdated;
             UnturnedPlayerEvents.OnPlayerWear += OnWear;
@@ -28,22 +29,22 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
 
             Logger.Log("ExtraRestrictor Loaded!");
             Logger.Log("Users with the permission extrarestrictor.bypass will bypass restrictions.");
-            Logger.Log($"Ignore admins: {Configuration.Instance.IgnoreAdmins}");
-            Logger.Log($"Notify on item replace: {Configuration.Instance.NotifyReplace}");
-            Logger.Log($"Notify on item remove: {Configuration.Instance.NotifyRemove}");
-            Logger.Log($"Notify on craft declined: {Configuration.Instance.NotifyDeclineCraft}");
+            Logger.Log($"Ignore admins: {Conf.IgnoreAdmins}");
+            Logger.Log($"Notify on item replace: {Conf.NotifyReplace}");
+            Logger.Log($"Notify on item remove: {Conf.NotifyRemove}");
+            Logger.Log($"Notify on craft declined: {Conf.NotifyDeclineCraft}");
 
             Logger.Log("Restricted items:");
             Logger.Log("===================================================================");
 
-            foreach (var item in Configuration.Instance.RestrictedItems
+            foreach (var item in Conf.RestrictedItems
                 .Select(x => $"ID: {x.Id} | Name: {Assets.find(EAssetType.ITEM, x.Id)?.name ?? "> INVALID ID <"} | Replace: {(x.Replace == 0 ? "None" : x.Replace.ToString())} | Bypass: {(x.Bypass ?? "None")}"))
                 Logger.Log(item);
 
             Logger.Log("Restricted blueprints:");
             Logger.Log("===================================================================");
 
-            foreach (var item in Configuration.Instance.RestrictedBlueprints
+            foreach (var item in Conf.RestrictedBlueprints
                 .Select(x => $"ItemID: {x.ItemId} | Name: {Assets.find(EAssetType.ITEM, x.ItemId)?.name ?? "> INVALID ID <"} | Blueprint Index: {(x.BlueprintIndex)} | Bypass: {(x.Bypass ?? "None")}"))
                 Logger.Log(item);
             Logger.Log("===================================================================");
@@ -58,10 +59,11 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
 
         private void OnInventoryUpdated(UnturnedPlayer player, InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
         {
-            if ((player.IsAdmin && Configuration.Instance.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
+            
+            if ((player.IsAdmin && Conf.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
                 return;
 
-            RestrictedItem item = Configuration.Instance.RestrictedItems.FirstOrDefault(x => x.Id == P.item.id);
+            RestrictedItem item = Conf.RestrictedItems.FirstOrDefault(x => x.Id == P.item.id);
 
             if (item != null && !player.GetPermissions().Any(x => x.Name == item.Bypass))
             {
@@ -79,14 +81,14 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
                             player.Inventory.forceAddItem(replacement, false);
                         }
                     }
-                    if (Configuration.Instance.NotifyReplace)
+                    if (Conf.NotifyReplace)
                     {
                         UnturnedChat.Say(player, Util.Translate("item_replaced",
                         Assets.find(EAssetType.ITEM, P.item.id).name, P.item.id,
                         Assets.find(EAssetType.ITEM, item.Replace).name, item.Replace), Color.yellow);
                     }   
                 }
-                else if (Configuration.Instance.NotifyRemove)
+                else if (Conf.NotifyRemove)
                 {
                     UnturnedChat.Say(player, Util.Translate("item_restricted", Assets.find(EAssetType.ITEM, P.item.id).name, P.item.id), Color.red);
                 }
@@ -96,10 +98,10 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
         private void OnWear(UnturnedPlayer player, UnturnedPlayerEvents.Wearables wear, ushort id, byte? quality)
         {
             
-            if ((player.IsAdmin && Configuration.Instance.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
+            if ((player.IsAdmin && Conf.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
                 return;
 
-            RestrictedItem item = Configuration.Instance.RestrictedItems.FirstOrDefault(x => x.Id == id);
+            RestrictedItem item = Conf.RestrictedItems.FirstOrDefault(x => x.Id == id);
 
             if (item != null && !player.GetPermissions().Any(x => x.Name == item.Bypass))
             {
@@ -150,18 +152,45 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
         {
             UnturnedPlayer player = UnturnedPlayer.FromPlayer(crafting.player);
 
-            if ((player.IsAdmin && Configuration.Instance.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
+            if ((player.IsAdmin && Conf.IgnoreAdmins) || player.GetPermissions().Any(x => x.Name == "extrarestrictor.bypass"))
                 return;
 
+            Blueprint blueprint = ((ItemAsset)Assets.find(EAssetType.ITEM, itemID)).blueprints[blueprintIndex];
             ushort innerItemId = itemID;
             byte innerBlueprintIdx = blueprintIndex;
-            RestrictedBlueprint blueprint = Configuration.Instance.RestrictedBlueprints.FirstOrDefault(x => x.ItemId == innerItemId && x.BlueprintIndex == innerBlueprintIdx);
+            bool restricted = false;
 
-            if (blueprint != null && !player.GetPermissions().Any(x => x.Name == blueprint.Bypass))
+            foreach (BlueprintSupply supply in blueprint.supplies)
+            {
+                if (Conf.RestrictByCraftingSupply.Contains(supply.id))
+                {
+                    restricted = true;
+                    break;
+                }
+            }
+            if (!restricted)
+            {
+                foreach (BlueprintOutput output in blueprint.outputs)
+                {
+                    if (Conf.RestrictByCraftingOutput.Contains(output.id))
+                    {
+                        restricted = true;
+                        break;
+                    }
+                }
+            }
+
+
+            RestrictedBlueprint restBlueprint = Conf.RestrictedBlueprints.FirstOrDefault(x => x.ItemId == innerItemId && x.BlueprintIndex == innerBlueprintIdx);
+            if( restBlueprint != null) {
+                restricted = true;
+            }
+            // check if blueprint is restricted and is not bypassed
+            if (restricted && (restBlueprint == null || !player.GetPermissions().Any(x => x.Name == restBlueprint.Bypass)))
             {
                 shouldAllow = false;
 
-                if (Configuration.Instance.NotifyDeclineCraft)
+                if (Conf.NotifyDeclineCraft)
                 {
                     UnturnedChat.Say(player, Util.Translate("blueprint_restricted", Assets.find(EAssetType.ITEM, innerItemId).name, innerItemId), Color.red);
                 }
