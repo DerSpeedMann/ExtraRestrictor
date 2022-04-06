@@ -18,11 +18,21 @@ RestrictedItems allows to list item ids to be restricted (removed or replaced)
 ## Restrict Blueprints:
 
 RestrictedBlueprint allows to restrict blueprints for items by id and index (disable crafting)
+- Value: Id of the item containing the blueprint
 - BlueprintIndex: the index of the blueprint (Blueprint_0_... would be index 0)
+- BypassPermission: allows to define a permission that can bypass this blueprint
+
+RestrictByCraftingSupply: allowes to restrict blueprints by supply item Id
+RestrictByCraftingOutput: allowes to restrict blueprints by output item Id
 ```xml
 <RestrictedBlueprint BlueprintIndex="1">1169</RestrictedBlueprint>
+<RestrictByCraftingSupply>
+  <RestrictedSupply>67</RestrictedSupply>
+</RestrictByCraftingSupply>
+<RestrictByCraftingOutput>
+  <RestrictedOutput>66</RestrictedOutput>
+</RestrictByCraftingOutput>
 ```
-
 
 ##  Settings for Ammo Crates ( Unload Magazines ) Remastered Mod
 
