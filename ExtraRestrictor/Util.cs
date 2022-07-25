@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ExtraConcentratedJuice.ExtraRestrictor
+namespace SpeedMann.ExtraRestrictor
 {
     public static class Util
     {

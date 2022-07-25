@@ -4,15 +4,13 @@ using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("ExtraRestrictor")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("ExtraRestrictor")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2018")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyTitle("UnloadMags")]
+[assembly: AssemblyDescription("UnloadMags")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("UnloadMags")]
+[assembly: AssemblyCopyright("SpeedMann")]
+[assembly: AssemblyTrademark("UnloadMags")]
+
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

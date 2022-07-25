@@ -12,7 +12,7 @@ using System.Collections;
 using Logger = Rocket.Core.Logging.Logger;
 using System;
 
-namespace ExtraConcentratedJuice.ExtraRestrictor
+namespace SpeedMann.ExtraRestrictor
 {
     public class ExtraRestrictor : RocketPlugin<ExtraRestrictorConfiguration>
     {
@@ -27,7 +27,7 @@ namespace ExtraConcentratedJuice.ExtraRestrictor
             UnturnedPlayerEvents.OnPlayerWear += OnWear;
             PlayerCrafting.onCraftBlueprintRequested += OnCraft;
 
-            Logger.Log("ExtraRestrictor Loaded!");
+            Logger.Log("UloadMags Loaded!");
             Logger.Log("Users with the permission extrarestrictor.bypass will bypass restrictions.");
             Logger.Log($"Ignore admins: {Conf.IgnoreAdmins}");
             Logger.Log($"Notify on item replace: {Conf.NotifyReplace}");
