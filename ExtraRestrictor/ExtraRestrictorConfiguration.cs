@@ -71,34 +71,36 @@ namespace SpeedMann.ExtraRestrictor
                 new RestrictedItem { Replace = 40452, KeepAmount = true, Id = 298 },
                 new RestrictedItem { Replace = 40453, KeepAmount = true, Id = 20 },
                 new RestrictedItem { Replace = 40500, KeepAmount = true, Id = 1384 },
-                new RestrictedItem { Replace = 40500, KeepAmount = true, Id = 1003 },
-                new RestrictedItem { Replace = 40500, KeepAmount = true, Id = 1005 },
+                new RestrictedItem { Replace = 40501, KeepAmount = true, Id = 1003 },
+                new RestrictedItem { Replace = 40502, KeepAmount = true, Id = 1005 },
             };
             RestrictedBlueprints = new List<RestrictedBlueprint>
             {
-                //Hells_Fury Reloads:
+                /*
+                //Hells_Fury Military Crafts:
 
                 // Military_40
                 new RestrictedBlueprint {ItemId = 40402, BlueprintIndex = 0},
                 // AmmoCrateLCMil
                 new RestrictedBlueprint {ItemId = 40402, BlueprintIndex = 4},
-                // Ranger_40
-                new RestrictedBlueprint {ItemId = 40402, BlueprintIndex = 2},
-                // AmmoCrateLCRan
-                new RestrictedBlueprint {ItemId = 40402, BlueprintIndex = 3},
-
-                //Hells_Fury Unloads:
-
                 // Military_40
                 new RestrictedBlueprint {ItemId = 40202, BlueprintIndex = 13},
                 // AmmoCrateLCMil
                 new RestrictedBlueprint {ItemId = 40122, BlueprintIndex = 13},
 
+
+                //Hells_Fury Ranger Crafts:
+                
+                // Ranger_40
+                new RestrictedBlueprint {ItemId = 40402, BlueprintIndex = 2},
+                // AmmoCrateLCRan
+                new RestrictedBlueprint {ItemId = 40402, BlueprintIndex = 3},
                 // Ranger_40
                 new RestrictedBlueprint {ItemId = 40204, BlueprintIndex = 15},  
                 // AmmoCrateLCRan
                 new RestrictedBlueprint {ItemId = 40124, BlueprintIndex = 15},
-    
+                */
+
             };
             RestrictByCraftingSupply = new List<ushort>
             {
