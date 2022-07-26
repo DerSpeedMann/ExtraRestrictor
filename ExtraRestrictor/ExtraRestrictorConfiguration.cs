@@ -27,10 +27,10 @@ namespace SpeedMann.ExtraRestrictor
             RestrictedItems = new List<RestrictedItem>
             {
                 new RestrictedItem { Replace = 40121, Empty = true, Id = 40150 },
-                new RestrictedItem { Replace = 40122, Empty = true, Id = 40151 },
-                new RestrictedItem { Replace = 40123, Empty = true, Id = 40152 },
-                new RestrictedItem { Replace = 40124, Empty = true, Id = 40153 },
-                new RestrictedItem { Replace = 40125, Empty = true, Id = 40154 },
+                new RestrictedItem { Replace = 40122, Empty = true, Id = 40152 },
+                new RestrictedItem { Replace = 40123, Empty = true, Id = 40151 },
+                new RestrictedItem { Replace = 40124, Empty = true, Id = 40154 },
+                new RestrictedItem { Replace = 40125, Empty = true, Id = 40153 },
                 new RestrictedItem { Replace = 40200, KeepAmount = true, Id = 44 },
                 new RestrictedItem { Replace = 40201, KeepAmount = true, Id = 1192 },
                 new RestrictedItem { Replace = 40202, KeepAmount = true, Id = 43 },
